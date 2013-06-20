@@ -90,11 +90,11 @@ class MapReduceJob:
             mapper.start()
 
         while len(self.data)>0:
-            for mapper in self.mappers:
-                
+            for mapper in self.mappers:                
                 if len(self.data)>0:
                     task = self.data.popitem()
                     mapper.push(task)
+                    
         for mapper in self.mappers:
             mapper.push(None)
         for mapper in self.mappers:
@@ -102,17 +102,16 @@ class MapReduceJob:
             
         for reducer in self.reducers:
             self.push(None)    
- 
         for reducer in self.reducers:
-            for k,v in reducer.result.items():
-                
+            reducer.join()
+        for reducer in self.reducers:
+            for k,v in reducer.result.items():                
                 if self.result.has_key(k):
                     self.result[k] = self.reducer(self.result[k],v)
                 else:
                     self.result[k] = v   
     def output(self):
-        for reducer in self.reducers:
-            reducer.join()
+
         return self.result
     
 if __name__ == "__main__":
